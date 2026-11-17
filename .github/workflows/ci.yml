@@ -1,0 +1,29 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  test-and-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: |
+          pip install -e ".[dev]"
+      - name: Unit tests
+        run: pytest -q
+      # The eval gate: the golden set of known-bad / known-clean code
+      # must keep precision >= 0.80 and recall >= 0.85 or the build fails.
+      - name: Evaluation gate
+        run: python eval/run_eval.py
+      - name: Upload eval report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: eval/report.json

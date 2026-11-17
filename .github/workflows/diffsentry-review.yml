@@ -1,0 +1,19 @@
+name: DiffSentry Review
+# Dogfooding: DiffSentry reviews every pull request on this repo.
+# Consumers copy this file (or `uses: Sravanthipanga/diffsentry@v1`)
+# to get the same review on their own PRs.
+on:
+  pull_request:
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          engine: static
+          fail-on: high
