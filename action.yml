@@ -1,0 +1,47 @@
+name: "DiffSentry Review"
+description: "AI-powered code review with schema-enforced structured output — posts findings as a PR comment and fails on high-severity issues."
+author: "Sravanthi Panga"
+branding:
+  icon: "shield"
+  color: "purple"
+inputs:
+  engine:
+    description: "Review engine: static (no key needed) | openai | anthropic"
+    required: false
+    default: "static"
+  fail-on:
+    description: "Lowest severity that fails the check: high | medium | low | never"
+    required: false
+    default: "high"
+  max-tokens:
+    description: "Per-chunk token budget for large diffs"
+    required: false
+    default: "3000"
+  github-token:
+    description: "Token used to fetch the PR diff and post the review comment"
+    required: false
+    default: "${{ github.token }}"
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - name: Install DiffSentry
+      shell: bash
+      run: pip install "${{ github.action_path }}"
+    - name: Review this pull request
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        OPENAI_API_KEY: ${{ env.OPENAI_API_KEY }}
+        ANTHROPIC_API_KEY: ${{ env.ANTHROPIC_API_KEY }}
+      run: >
+        diffsentry review
+        --pr "${{ github.event.pull_request.number }}"
+        --repo "${{ github.repository }}"
+        --engine "${{ inputs.engine }}"
+        --max-tokens "${{ inputs.max-tokens }}"
+        --format markdown
+        --post
+        --fail-on "${{ inputs.fail-on }}"

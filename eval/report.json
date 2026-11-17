@@ -1,0 +1,92 @@
+{
+ "precision": 1.0,
+ "recall": 1.0,
+ "thresholds": {
+  "precision": 0.8,
+  "recall": 0.85
+ },
+ "cases": [
+  {
+   "file": "bad_auth.py",
+   "expected": [
+    "eval-exec",
+    "hardcoded-secret",
+    "sql-string-concat"
+   ],
+   "predicted": [
+    "eval-exec",
+    "hardcoded-secret",
+    "sql-string-concat"
+   ],
+   "missed": [],
+   "false_positives": []
+  },
+  {
+   "file": "bad_api.py",
+   "expected": [
+    "bare-except",
+    "missing-error-handling",
+    "swallowed-exception"
+   ],
+   "predicted": [
+    "bare-except",
+    "missing-error-handling",
+    "swallowed-exception"
+   ],
+   "missed": [],
+   "false_positives": []
+  },
+  {
+   "file": "bad_perf.py",
+   "expected": [
+    "concat-in-loop",
+    "db-query-in-loop",
+    "regex-in-loop"
+   ],
+   "predicted": [
+    "concat-in-loop",
+    "db-query-in-loop",
+    "regex-in-loop"
+   ],
+   "missed": [],
+   "false_positives": []
+  },
+  {
+   "file": "bad_core.py",
+   "expected": [
+    "assert-in-production",
+    "mutable-default-arg",
+    "shell-injection",
+    "unsafe-deserialization",
+    "weak-hash"
+   ],
+   "predicted": [
+    "assert-in-production",
+    "mutable-default-arg",
+    "shell-injection",
+    "unsafe-deserialization",
+    "weak-hash"
+   ],
+   "missed": [],
+   "false_positives": []
+  },
+  {
+   "file": "clean_service.py",
+   "expected": [],
+   "predicted": [],
+   "missed": [],
+   "false_positives": []
+  },
+  {
+   "file": "bad_new_feature.py",
+   "expected": [
+    "missing-tests"
+   ],
+   "predicted": [
+    "missing-tests"
+   ],
+   "missed": [],
+   "false_positives": []
+  }
+ ]
+}
