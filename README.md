@@ -22,6 +22,30 @@ issue is a Pydantic-validated `ReviewIssue` with a severity, a category, an
 exact `file:line`, an explanation, and a suggested fix. There is no free-form
 review text anywhere in the system.
 
+## Architecture
+
+```mermaid
+flowchart LR
+    A["Pull request<br/>GitHub API"] --> P
+    B["Diff file / plain files"] --> P
+    C["Local git diff"] --> P
+    P["diffparse<br/>files · hunks · new-file line numbers"] --> K["chunking<br/>hunk + function boundaries<br/>token budget"]
+    K --> E{"engine"}
+    E -->|static| S["AST rule engine<br/>15 deterministic rules"]
+    E -->|openai / anthropic| L["LLM per chunk<br/>schema-bound structured output"]
+    S --> R["CodeReviewResult<br/>Pydantic-validated findings"]
+    L --> R
+    R --> O["Terminal · JSON · Markdown"]
+    R --> G{"fail-on gate"}
+    G -->|findings at or above threshold| X["exit 1"]
+    G -->|below threshold| Y["exit 0"]
+    O --> PR["PR comment with --post"]
+```
+
+Every input path converges on the same pipeline, every engine returns the
+same schema, and the exit code is a pure function of the findings — which is
+what lets one command serve as a local tool, a CI gate, and a GitHub Action.
+
 ## The three hard problems, handled
 
 1. **Large diffs > context window.** Chunking is structure-aware: diffs are
@@ -33,6 +57,16 @@ review text anywhere in the system.
    Pydantic model, Anthropic with a forced tool whose `input_schema` is the
    same model. Output is validated with `model_validate`; a validation
    failure is fed back for one repair retry. Zero regex scraping of prose.
+
+   ```mermaid
+   flowchart TD
+       C["Diff chunk"] --> M["Model call<br/>JSON Schema / forced tool"]
+       M --> V{"Pydantic validation"}
+       V -->|valid| OK["ReviewIssue list"]
+       V -->|invalid, first time| F["Feed the validation error back"]
+       F --> M
+       V -->|invalid, second time| FAIL["Fail loudly<br/>no prose ever ships"]
+   ```
 3. **Measurable quality.** A golden set of known-bad and known-clean code
    (`eval/`) is scored for **precision and recall** and gated in CI
    (precision ≥ 0.80, recall ≥ 0.85). Current: **1.00 / 1.00**.
@@ -96,6 +130,15 @@ DiffSentry's own PRs with the local action. A composite `action.yml` is at
 the repo root.
 
 ## Evaluation
+
+```mermaid
+flowchart LR
+    G["Golden set<br/>known-bad + known-clean samples"] --> R["Static engine review"]
+    R --> S["Score by file and rule<br/>precision · recall"]
+    S --> Q{"precision at least 0.80<br/>recall at least 0.85"}
+    Q -->|yes| PASS["CI passes"]
+    Q -->|no| BLOCK["CI fails — build blocked"]
+```
 
 ```console
 python eval/run_eval.py   # writes eval/report.json, exits 1 on gate failure
