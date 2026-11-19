@@ -2,7 +2,7 @@
 
 **AI-powered code review for diffs and pull requests — infrastructure, not a script.**
 
-![Python 3.12](https://img.shields.io/badge/python-3.12-blue) ![Tests](https://img.shields.io/badge/tests-17%20passing-brightgreen) ![Eval](https://img.shields.io/badge/eval-precision%201.00%20·%20recall%201.00-brightgreen) ![License](https://img.shields.io/badge/license-ISC-blue)
+![Python 3.12](https://img.shields.io/badge/python-3.12-blue) ![Tests](https://img.shields.io/badge/tests-17%20passing-brightgreen) ![Eval](https://img.shields.io/badge/eval-precision%201.00%20·%20recall%201.00-brightgreen) ![License](https://img.shields.io/badge/license-ISC-blue) [![CI](https://github.com/Sravanthipanga/diffsentry/actions/workflows/ci.yml/badge.svg)](https://github.com/Sravanthipanga/diffsentry/actions/workflows/ci.yml)
 
 ```console
 $ diffsentry review --pr 142 --repo you/your-project
@@ -157,4 +157,4 @@ pytest -q
 
 ## License
 
-ISC License — see [LICENSE](LICENSE). © 2026 Sravanthi Panga.
+MIT License — see [LICENSE](LICENSE). © 2026 Sravanthi Panga.
